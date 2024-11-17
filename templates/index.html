@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #2c2f33;
+      color: #ffffff;
+    }
+    .container {
+      background: #23272a;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      width: 300px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #7289da;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #5b6eae;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Generate Certificate</h2>
+    <form id="certificateForm">
+      <input type="text" id="udid" placeholder="Enter your UDID" required>
+      <input type="text" id="discordUsername" placeholder="Enter your Discord Username" required>
+      <button type="submit">Generate</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('certificateForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const udid = document.getElementById('udid').value;
+      const discordUsername = document.getElementById('discordUsername').value;
+
+      if (!udid || !discordUsername) {
+        alert('Please fill out both fields.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ udid, discordUsername })
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'private_certificate.zip';
+          link.click();
+          alert('Your certificate has been generated and downloaded.');
+        } else {
+          alert('Failed to generate the certificate. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again later.');
+      }
+    });
+  </script>
+</body>
+</html>
